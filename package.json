@@ -1,6 +1,6 @@
 {
   "name": "private-mixin",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "description": "Augment classes or individual objects with contracts that may include private fields",
   "engines": {
     "node": ">=10.3.0"

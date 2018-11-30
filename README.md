@@ -24,6 +24,7 @@ solutions in 2298 when the decorators proposal reaches stage 3.
   - [Defining a mixin](#defining-a-mixin)
   - [Using a mixin with a class](#using-a-mixin-with-a-class)
   - [Using a mixin with other objects](#using-a-mixin-with-other-objects)
+  - [Using mixin contracts at-scope](#using-mixin-contracts-at-scope)
 - [How it works](#how-it-works)
 
 <!-- /MarkdownTOC -->
@@ -53,11 +54,11 @@ objects often do.
 Private fields follow a similar model to the “WeakMap pattern.” In the WeakMap
 pattern, keys are public object instances and values are private state. This,
 too, allows implementing host-like APIs, branding, and nearly genuine privacy.
-That “nearly” qualifier concerns the fact the global mutability of
-`globalThis.WeakMap`, `WeakMap.prototype.set`, etc — a determined agent that is
-able to evaluate code before your modules could patch these and spy. This isn’t
-generally something people worry about, but it’s a notable difference. Because
-private fields are syntactic and the implied “hidden WeakMap” is fully
+That “nearly” qualifier concerns the fact that `globalThis.WeakMap`,
+`WeakMap.prototype.set`, and so on are globally mutable. A determined agent that
+is able to evaluate code before your modules could patch these and spy. This
+isn’t generally something people worry about, but it’s a notable difference.
+Because private fields are syntactic and the implied “hidden WeakMap” is fully
 abstracted, the API cannot be tainted or forged.
 
 There is another critical difference between the WeakMap pattern and private
@@ -197,6 +198,42 @@ function createEarth() {
 }
 
 createEarth().theAnswer(); // "42?"
+```
+
+### Using mixin contracts at-scope
+
+The final part of this is the most important. So far we’ve dealt with the idea
+that these pieces of functionality can be defined commonly and use the same
+field keys, but the other issue we described earlier is sharing the associated
+functionality with other module internals (which have knowledge of the the
+contract but not themselves be implementers of it). This is handled by
+`Mixin.prototype.api`.
+
+```js
+answerMixin.api.theAnswer(earth); // "44!"
+```
+
+Each of the prototype methods will be “inverted” on `mixin.api` so that the
+receiver is the first argument. For accessors that have both `get` and `set`,
+arity determines which behavior is applied.
+
+Static methods don’t need to be reflected on `api` because they already work
+like this.
+
+It’s up to you what the visibility of any API is. You don’t need to export a
+mixin, and you don’t need to use `extend` or `extendObject` at all:
+
+```js
+function createEarth2() {
+  const earth = {};
+  answerMixin.super(earth, '?');
+  return earth;
+}
+
+const earth2 = createEarth2();
+
+earth2.theAnswer; // undefined
+answerMixin.api.theAnswer(earth2); // "42?"
 ```
 
 ## How it works

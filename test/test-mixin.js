@@ -204,6 +204,7 @@ tap.test('Examples from README work', async tap => {
 
     tap.equal(earth.theAnswer(), '42!', 'expected output');
     tap.equal(earth.theAnswer(), '43!', 'expected output');
+    tap.equal(answerMixin.api.theAnswer(earth), '44!', 'expected output');
   });
 
   tap.test('use with createEarth factory', async tap => {
@@ -215,5 +216,18 @@ tap.test('Examples from README work', async tap => {
     }
 
     tap.equal(createEarth().theAnswer(), '42?', 'expected output');
+  });
+
+  tap.test('use with createEarth2 factory', async tap => {
+    function createEarth2() {
+      const earth = {};
+      answerMixin.super(earth, '?');
+      return earth;
+    }
+
+    const earth2 = createEarth2();
+
+    tap.equal(earth2.theAnswer, undefined);
+    tap.equal(answerMixin.api.theAnswer(earth2), '42?');
   });
 });

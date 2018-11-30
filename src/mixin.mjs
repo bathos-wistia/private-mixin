@@ -7,7 +7,7 @@
 
 const
   { Object, Proxy, TypeError } = getGlobalThis(),
-  { assign, create, defineProperties, getOwnPropertyDescriptors } = Object,
+  { assign, create, defineProperties, freeze, getOwnPropertyDescriptors } = Object,
   { isPrototypeOf } = Object.prototype,
   { apply, construct } = Reflect,
   IS_CSTR_HANDLER = assign(create(null), { construct: () => ({}) });
@@ -35,6 +35,7 @@ const
 
 export default class Mixin {
   #Constructor;
+  #api;
   #constructorDescriptors;
   #prototypeDescriptors;
 
@@ -50,6 +51,11 @@ export default class Mixin {
     this.#Constructor = Constructor;
     this.#constructorDescriptors = getConstructorPDs(Constructor);
     this.#prototypeDescriptors = getPrototypePDs(Constructor);
+    this.#api = createAPI(this.#prototypeDescriptors);
+  }
+
+  get api() {
+    return this.#api;
   }
 
   extend(Target) {
@@ -108,6 +114,32 @@ setPDs(Mixin.Super, {
 });
 
 ////////////////////////////////////////////////////////////////////////////////
+
+function createAPI(descriptors) {
+  const api = {};
+
+  for (const key in descriptors) {
+    const { get, set, value } = descriptors[key];
+
+    if (get && set) {
+      api[key] = function value(receiver, value) {
+        return arguments.length > 1
+          ? apply(set, receiver, [ value ])
+          : apply(get, receiver, [])
+      };
+    } else if (get) {
+      api[key] = receiver => apply(get, receiver, []);
+    } else if (set) {
+      api[key] = (receiver, value) => apply(set, receiver, [ value ]);
+    } else if (typeof value === 'function') {
+      api[key] = (receiver, ...args) => apply(value, receiver, args);
+    }
+  }
+
+  freeze(api);
+
+  return api;
+}
 
 function getConstructorPDs(Constructor) {
   const pds = getOwnPropertyDescriptors(Constructor);
