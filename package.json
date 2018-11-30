@@ -1,0 +1,37 @@
+{
+  "name": "private-mixin",
+  "version": "1.0.0",
+  "description": "Augment classes or individual objects with contracts that may include private fields",
+  "engines": {
+    "node": ">=10.3.0"
+  },
+  "main": "dist/mixin.js",
+  "module": "dist/mixin.mjs",
+  "scripts": {
+    "build": "node --experimental-modules build.mjs",
+    "prepublish": "npm run test",
+    "test": "npm run build && c8 tap --node-arg=--harmony-private-fields test/test-mixin.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/bathos/private-mixin.git"
+  },
+  "keywords": [
+    "private",
+    "field",
+    "slot",
+    "mixin",
+    "class"
+  ],
+  "author": "Darien Maillet Valentine",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/bathos/private-mixin/issues"
+  },
+  "homepage": "https://github.com/bathos/private-mixin#readme",
+  "dependencies": {},
+  "devDependencies": {
+    "c8": "^3.2.1",
+    "tap": "^12.1.0"
+  }
+}
