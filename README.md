@@ -205,8 +205,8 @@ createEarth().theAnswer(); // "42?"
 The final part of this is the most important. So far we’ve dealt with the idea
 that these pieces of functionality can be defined commonly and use the same
 field keys, but the other issue we described earlier is sharing the associated
-functionality with other module internals (which have knowledge of the the
-contract but not themselves be implementers of it). This is handled by
+functionality with other module internals (which have knowledge of the contract
+but may not themselves be implementers of it). This is handled by
 `Mixin.prototype.api`.
 
 ```js
