@@ -74,8 +74,8 @@ object will always throw, while in the WeakMap pattern, whether to throw is a
 choice.
 
 From here on I’ll sometimes conflate “slot” and “field.” That they are different
-is ultimately not observable, though making the latter behave like the former is
-not straightforward.
+is ultimately not observable except when it comes to cross-realm behaviors,
+though making the latter behave like the former is not straightforward.
 
 ### Challenges of private fields
 
